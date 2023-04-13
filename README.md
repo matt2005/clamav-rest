@@ -1,15 +1,13 @@
-![Build Status](https://travis-ci.org/niilo/clamav-rest.svg) [![Docker Pulls](https://img.shields.io/docker/pulls/niilo/clamav-rest.svg)]()
-
 This is two in one docker image so it runs open source virus scanner ClamAV (https://www.clamav.net/), automatic virus definition updates as background process and REST api interface to interact with ClamAV process.
 
-Travis CI build will build new release on weekly basis and push those to Docker hub [ClamAV-rest docker image](https://hub.docker.com/r/niilo/clamav-rest/). Virus definitions will be updated on every docker build.
+Travis CI build will build new release on weekly basis and push those to github container repository [ClamAV-rest docker image](https://ghcr.io/dfe-digital/clamav-rest). Virus definitions will be updated on every docker build.
 
 
 ## Usage:
 
 Run clamav-rest docker image:
 ```bash
-docker run -p 9000:9000 --rm -it niilo/clamav-rest
+docker run -p 9000:9000 --rm -it ghcr.io/dfe-digital/clamav-rest
 ```
 
 Test that service detects common test virus signature:
@@ -52,6 +50,6 @@ Content-Length: 33
 Build golang (linux) binary and docker image:
 ```bash
 env GOOS=linux GOARCH=amd64 go build
-docker build . -t niilo/clamav-rest
-docker run -p 9000:9000 --rm -it niilo/clamav-rest
+docker build . -t clamav-rest
+docker run -p 9000:9000 --rm -it clamav-rest
 ```
