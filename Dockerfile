@@ -1,11 +1,36 @@
 # build stage
-FROM golang:alpine AS build-env
+FROM golang:alpine AS build-zscaler
+USER root
+
+# To be able to download `ca-certificates` with `apk add` command
+COPY ZscalerRootCertificate-2048-SHA256.crt /root/ZscalerRootCertificate-2048-SHA265.crt
+RUN cat /root/ZscalerRootCertificate-2048-SHA265.crt >> /etc/ssl/certs/ca-certificates.crt
+
+# Add again root CA with `update-ca-certificates` tool
+RUN apk --no-cache add ca-certificates \
+    && rm -rf /var/cache/apk/*
+COPY ZscalerRootCertificate-2048-SHA256.crt /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
+FROM build-zscaler AS build-env
 ADD . /go/src/clamav-rest/
 RUN cd /go/src/clamav-rest && go build -v
 
 # dockerize stage
-FROM alpine
+FROM alpine AS zscaler
+USER root
 
+# To be able to download `ca-certificates` with `apk add` command
+COPY ZscalerRootCertificate-2048-SHA256.crt /root/ZscalerRootCertificate-2048-SHA265.crt
+RUN cat /root/ZscalerRootCertificate-2048-SHA265.crt >> /etc/ssl/certs/ca-certificates.crt
+
+# Add again root CA with `update-ca-certificates` tool
+RUN apk --no-cache add ca-certificates \
+    && rm -rf /var/cache/apk/*
+COPY ZscalerRootCertificate-2048-SHA256.crt /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
+FROM zscaler as deploy
 RUN apk --no-cache add clamav clamav-libunrar \
     && mkdir /run/clamav \
     && chown clamav:clamav /run/clamav
